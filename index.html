@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HW 8: API Fun!</title>
+
+    <style type="text/css">
+        html, body {
+            font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            margin: 20px;
+        }
+        div {
+            display: flex;
+            flex-wrap: wrap;
+            width: 400px;
+            
+        }
+        #art-info {
+            padding-top: 20px;
+            width: 280px;
+            display: block;
+        }
+        #questions {
+            display: block;
+            width: 800px;
+        }
+
+    </style>
+
+    <script>
+        // loadData : Gets data from Met API and prints artwork data if call
+        //            was successful
+        function loadData() {
+
+            const display1 = document.getElementById("request1");
+
+            request = new XMLHttpRequest();
+            request.open("GET", "https://collectionapi.metmuseum.org/public/collection/v1/objects/436121", true);
+
+            request.onreadystatechange = function() {
+                // display data if request was successful
+                if (request.readyState == 4 && request.status == 200) {
+                    let data = request.responseText;
+                    displayData(JSON.parse(data), display1);
+                // display error if request failed
+                } else if (request.readyState == 4 && request.status != 200) {
+                    display1.innerHTML += "Request failed.";
+                }
+            };
+
+            request.send();
+        }
+
+    </script>
+
+</head>
+
+<body>
+    <h1>Homework 8: API Fun!</h1>
+
+    <div id="request1"><h3>Request by AJAX Data Pattern:</h3></div><br />
+    <div id="request2"><h3>Request by fetch method:</h3></div>
+
+    <script>
+
+        // displayData: Displays info on a given artwork in the given display
+        //        args: data, a JSON of artwork data
+        //              display, container to display artwork info in
+        function displayData(data, display) {
+            let str = "<img src='" + data["primaryImageSmall"] + "' style='width:300px;'/><br /><br />";
+            str += "<div id='art-info'><strong>Artist: </strong>" + data["constituents"][0]["name"] + "<br />";
+            str += "<strong>Title: </strong>" + data["title"] + "<br />";
+            str += "<strong>Year: </strong>" + data["objectDate"] + "<br />";
+            str += "<strong>Medium: </strong>" + data["medium"] + "<br />";
+            str += "<strong>Department: </strong>" + data["department"] + "<br /></div>";
+
+            display.innerHTML += str;
+        }
+
+        // first API access
+        loadData();
+
+        // second API access by fetch
+        const display2 = document.getElementById("request2");
+        res = fetch("https://collectionapi.metmuseum.org/public/collection/v1/objects/436121")
+              .then(res => res.text())
+              .then(data => {
+                    data = JSON.parse(data);
+                    displayData(data, display2);
+              })
+              .catch(error => display2.innerHTML += "Request failed.");
+    
+    </script>
+
+    <br /><br />
+    
+    <h3>Questions:</h3>
+    <div id="questions">
+        <p>
+            I selected The Metropolitan Museum of Art Collection API for this assignment
+            which allows users to access datasets on information of the more than 470,000
+            artworks at the Met. To access the information, you can search for works or 
+            departments by id or keywords.
+        </p>
+            
+        <p>Where I Found the API: <a href="https://github.com/public-apis/public-apis" target="_blank">https://github.com/public-apis/public-apis</a></p>
+        <p>Documentation: <a href="https://metmuseum.github.io/" target="_blank">https://metmuseum.github.io/</a></p>
+
+        <p>
+            Options I used for API request:
+            <ul>
+                <li>objects: Accesses the listing of available object IDs</li>
+                <li>436121: Object ID for the artwork I wanted info on</li>
+            </ul>
+        </p>
+
+        <p>
+            This API would be helpful if you wanted to create a webpage that could find
+            artwork at the Met with certain keyword elements. For example, I used postman
+            to identify works that had daisies in them and the API returned object IDs of
+            the works that fit this criteria which I then used to get the details on them.
+            This process could easily be converted to a page that would accept user input
+            for these keywords and then display the works. Another use for this API could
+            be to create your own online art gallery from works at the Met. You could do
+            a similar process of searching for works by keyword or finding them directly
+            and then display them on the page nicely. The API allows for easy access to 
+            uniform data that makes for a more modular solution than just hard-coding the
+            art you want into the page.
+        </p>
+    </div>
+    
+</body>
+</html>
